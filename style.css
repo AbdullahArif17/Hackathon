@@ -2,18 +2,18 @@ body{
     font-family: Arial, Helvetica, sans-serif;
     margin: 20px;
     padding: 0px;
-    background-color: beige;
+    background-color: #D0DB97;
 }
 
 h1{
     text-align: center;
-    color: blue;
+    color: #254D32;
 }
 
 form{
     max-width: 600px;
     margin: auto;
-    background-color: rgb(223, 223, 205);
+    background-color: #69B578;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
     border-radius: 8px;
     padding: 20px;
@@ -22,7 +22,7 @@ form{
 fieldset{
     border: 2px solid black;
     border-radius: 8px;
-    background-color: aliceblue;
+    background-color: #3A7D44;
     margin-bottom: 20px;
     padding: 20px;
 }
@@ -30,11 +30,13 @@ fieldset{
 legend{
     font-weight: bold;
     color: rgb(8, 8, 8);
+    font-size: large;
 }
 
 label{
     display: block;
     margin-top: 10px;
+    font-weight: bold;
 }
 
 textarea, input{
@@ -58,11 +60,10 @@ button{
     margin-left: 140px;
     cursor: pointer;
     font-size: 16px;
-    background-color: rgb(112, 97, 74);
+    background-color: #254D32;
     text-align: center;
 }
 
 button:hover{
-    background-color: black;
-    color: white;
+    background-color: #3A7D44;
 }
