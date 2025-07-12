@@ -505,73 +505,22 @@ input[type="file"]::-webkit-file-upload-button {
 }
 
 @media (max-width: 480px) {
-  /* Headings */
-  .header h1,
-  .resume-name {
-    font-size: 1.8rem;
-    text-align: center;
-    line-height: 1.2;
-  }
-
-  .section-title {
-    font-size: 1.2rem;
-    text-align: center;
-    margin-bottom: 10px;
-  }
-
-  /* Card Layouts */
-  .card,
-  .card-header,
-  .card-content {
-    padding: 12px 15px;
-    margin: 10px 0;
-    flex-direction: column;
+  .header h1 {
+    font-size: 2rem;
   }
 
   .card-header {
-    font-size: 1rem;
-    text-align: center;
+    padding: 15px 20px;
   }
 
   .card-content {
-    font-size: 0.95rem;
-    text-align: left;
-  }
-
-  /* Resume Container */
-  #resumeOut {
     padding: 15px;
-    margin: 0 auto;
-    width: 100%;
-    box-sizing: border-box;
   }
 
-  /* Tags, skills, badges */
-  .skill-tag {
-    font-size: 0.8rem;
-    padding: 5px 8px;
-    margin: 3px;
-    display: inline-block;
-  }
-
-  /* Optional: Stack columns vertically */
-  .columns {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  /* Reduce spacing for better fit */
-  .section-content {
-    padding: 10px;
-  }
-
-  /* Hide unnecessary elements */
-  .desktop-only {
-    display: none !important;
+  #resumeOut {
+    padding: 20px;
   }
 }
-
 
 /* Enhanced Print/PDF Styles */
 @media print {
