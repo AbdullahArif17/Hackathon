@@ -1,172 +1,135 @@
-document.getElementById("resume")?.addEventListener("submit", function (event) {
-  event.preventDefault();
-  console.log("Form submitted, preventing default");
+document.getElementById("resume").addEventListener("submit", function (e) {
+  e.preventDefault()
 
-  const formValues = getFormValues();
+  // Get form data
+  const formData = new FormData(this)
+  const data = {}
+  for (const [key, value] of formData.entries()) {
+    data[key] = value
+  }
 
-  if (formValues) {
-    const {
-      name,
-      email,
-      phone,
-      add,
-      education,
-      experience,
-      skill,
-      profilePicURL,
-      username,
-      github,
-      linkedin,
-    } = formValues;
-    const uniquePath = `${username.replace(/\s+/g, "_")}_cv.html`;
+  // Handle profile picture
+  const profilePicFile = document.getElementById("profilePic").files[0]
+  let profilePicSrc = ""
 
-    const resumeOut = generateResumeHTML(
-      profilePicURL,
-      name,
-      email,
-      phone,
-      add,
-      education,
-      experience,
-      skill,
-      github,
-      linkedin
-    );
-
-    displayResume(resumeOut);
-    makeEditable();
+  if (profilePicFile) {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      profilePicSrc = e.target.result
+      generateResume(data, profilePicSrc)
+    }
+    reader.readAsDataURL(profilePicFile)
   } else {
-    console.error("One or more form elements are missing");
+    generateResume(data, profilePicSrc)
   }
-});
+})
 
-function getFormValues() {
-  const elementpic = document.getElementById("profilePic");
-  const elementName = document.getElementById("name");
-  const elementEmail = document.getElementById("email");
-  const elementPhone = document.getElementById("phone");
-  const elementAdd = document.getElementById("add");
-  const elementEducation = document.getElementById("education");
-  const elementExperience = document.getElementById("experience");
-  const elementSkill = document.getElementById("skill");
-  const elementUser = document.getElementById("username");
-  const elementGitHub = document.getElementById("github");
-  const elementLinkedIn = document.getElementById("linkedin");
+function generateResume(data, profilePicSrc) {
+  const resumeOut = document.getElementById("resumeOut")
 
-  if (
-    elementpic &&
-    elementName &&
-    elementEmail &&
-    elementPhone &&
-    elementAdd &&
-    elementEducation &&
-    elementExperience &&
-    elementSkill &&
-    elementUser &&
-    elementGitHub &&
-    elementLinkedIn
-  ) {
-    return {
-      name: elementName.value.trim(),
-      email: elementEmail.value.trim(),
-      phone: elementPhone.value.trim(),
-      add: elementAdd.value.trim(),
-      education: elementEducation.value.trim(),
-      experience: elementExperience.value.trim(),
-      skill: elementSkill.value.trim(),
-      profilePicURL: elementpic.files?.[0] ? URL.createObjectURL(elementpic.files[0]) : "",
-      username: elementUser.value.trim(),
-      github: elementGitHub.value.trim(),
-      linkedin: elementLinkedIn.value.trim(),
-    };
+  // Generate skills tags
+  const skills = data.skill
+    .split(",")
+    .map((skill) => `<span class="skill-tag">${skill.trim()}</span>`)
+    .join("")
+
+  // Generate social links
+  let socialLinks = ""
+  if (data.github || data.linkedin) {
+    socialLinks = '<div class="social-links">'
+    if (data.github) {
+      socialLinks += `<a href="${data.github}" class="social-link" target="_blank">
+                <i class="fab fa-github"></i> GitHub
+            </a>`
+    }
+    if (data.linkedin) {
+      socialLinks += `<a href="${data.linkedin}" class="social-link" target="_blank">
+                <i class="fab fa-linkedin"></i> LinkedIn
+            </a>`
+    }
+    socialLinks += "</div>"
   }
-  return null;
+
+  resumeOut.innerHTML = `
+        <button class="download-btn" onclick="downloadPDF()">
+            <i class="fas fa-download"></i> Download PDF
+        </button>
+        
+        <div class="resume-header">
+            ${profilePicSrc ? `<img src="${profilePicSrc}" alt="Profile Picture" class="profile-pic">` : ""}
+            <h1 class="resume-name">${data.name}</h1>
+            <div class="contact-info">
+                <div class="contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>${data.email}</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-phone"></i>
+                    <span>${data.phone}</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>${data.add}</span>
+                </div>
+            </div>
+            ${socialLinks}
+        </div>
+        
+        <div class="resume-section">
+            <h2 class="section-title">
+                <i class="fas fa-graduation-cap"></i>
+                Education
+            </h2>
+            <div class="section-content">
+                <p>${data.education.replace(/\n/g, "<br>")}</p>
+            </div>
+        </div>
+        
+        <div class="resume-section">
+            <h2 class="section-title">
+                <i class="fas fa-briefcase"></i>
+                Experience
+            </h2>
+            <div class="section-content">
+                <p>${data.experience.replace(/\n/g, "<br>")}</p>
+            </div>
+        </div>
+        
+        <div class="resume-section">
+            <h2 class="section-title">
+                <i class="fas fa-code"></i>
+                Skills
+            </h2>
+            <div class="skills-container">
+                ${skills}
+            </div>
+        </div>
+    `
+
+  resumeOut.classList.add("show")
+  resumeOut.scrollIntoView({ behavior: "smooth" })
 }
 
-function generateResumeHTML(
-  profilePicURL,
-  name,
-  email,
-  phone,
-  add,
-  education,
-  experience,
-  skill,
-  github,
-  linkedin
-) {
-  return `
-    <h2>Resume</h2>
-    ${profilePicURL ? `<img src="${profilePicURL}" alt="Profile Picture" class="profilePic">` : ""}
-    <p><strong>Name:</strong><span id="edit-name" class="editable"> ${name}</span></p>
-    <p><strong>Email:</strong><span id="edit-email" class="editable">${email}</span></p>
-    <p><strong>Phone:</strong><span id="edit-phone" class="editable"> ${phone}</span></p>
-    <p><strong>Address:</strong><span id="edit-add" class="editable"> ${add}</span></p>
-     <h3>Social Links:</h3>
-    <p>
-      ${github ? `<a href="${github}" target="_blank"><i class="fab fa-github"></i> GitHub</a>` : ""}
-      <br/>
-      ${linkedin ? `<a href="${linkedin}" target="_blank"><i class="fab fa-linkedin"></i> LinkedIn</a>` : ""}
-    </p>
-    <h3>Education:</h3>
-    <p id="edit-education" class="editable">${education}</p>
-    <h3>Experience:</h3>
-    <p id="edit-experience" class="editable">${experience}</p>
-    <h3>Skills:</h3>
-    <p id="edit-skills" class="editable">${skill}</p>
-    
-  `;
-}
-
-function displayResume(resumeOut) {
-  const resumeOutElement = document.getElementById("resumeOut");
-  if (resumeOutElement) {
-    resumeOutElement.innerHTML = resumeOut;
-
-    const buttonContainer = document.createElement("div");
-    buttonContainer.id = "buttonContainer";
-    resumeOutElement.appendChild(buttonContainer);
-
-    const downloadButton = document.createElement("button");
-    downloadButton.textContent = "Download As PDF";
-    downloadButton.addEventListener("click", () => {
-      const options = {
-        margin: 0.5,
-        filename: 'resume.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-      };
-
-      html2pdf().from(resumeOutElement).set(options).save();
-    });
-    buttonContainer.appendChild(downloadButton);
+function downloadPDF() {
+  const element = document.getElementById("resumeOut")
+  const opt = {
+    margin: 0.5,
+    filename: "resume.pdf",
+    image: { type: "jpeg", quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
   }
+
+  window.html2pdf().set(opt).from(element).save()
 }
 
-function makeEditable() {
-  const editableElements = document.querySelectorAll(".editable");
-  editableElements.forEach((element) => {
-    element.addEventListener("click", function () {
-      const currentElement = element;
-      const currentValue = currentElement.textContent || "";
+// Add smooth scrolling for better UX
+document.querySelectorAll("input, textarea").forEach((element) => {
+  element.addEventListener("focus", function () {
+    this.parentElement.style.transform = "scale(1.02)"
+  })
 
-      if (currentElement.tagName === "P" || currentElement.tagName === "SPAN") {
-        const input = document.createElement("input");
-        input.type = "text";
-        input.value = currentValue;
-        input.classList.add("editing-input");
-
-        currentElement.style.display = "none";
-        currentElement.parentNode?.insertBefore(input, currentElement);
-        input.focus();
-
-        input.addEventListener("blur", () => {
-          currentElement.textContent = input.value;
-          currentElement.style.display = "";
-          input.remove();
-        });
-      }
-    });
-  });
-}
+  element.addEventListener("blur", function () {
+    this.parentElement.style.transform = "scale(1)"
+  })
+})
